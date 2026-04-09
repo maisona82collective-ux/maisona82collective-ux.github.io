@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maison82collective</title>
+  <meta name="description" content="Maison82collective — DJ Collective. Events, Mixes, Culture." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* Avenir system font stack */
+    @font-face { font-family: 'Avenir'; src: local('Avenir Next'), local('Avenir'), local('AvenirNext-Regular'); }
+  </style>
+
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --y: #ffcf00;
+      --r: #ff3600;          /* orb gradient only */
+      --o: #cc3d00;          /* muted orange — UI accent */
+      --k:  #505050;         /* primary text — medium gray */
+      --k2: #6b6b6b;         /* secondary text — medium gray */
+      --k3: #a0a0a0;         /* labels / meta — light gray */
+      --w: #ffffff;
+      --mid: rgba(42,42,42,.45);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--w);
+      color: var(--k);
+      font-family: 'DM Mono', 'Courier New', monospace;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── CURSOR ─── */
+    #cur  { position: fixed; width: 7px; height: 7px; background: var(--k); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform .12s, background .2s; }
+    #ring { display: none; }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Giant orb behind everything */
+    .orb-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .orb-bg svg {
+      width: 200vmax;
+      height: 200vmax;
+      will-change: transform;
+    }
+
+    .hero-title {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-family: 'Avenir Next', 'Avenir', 'Nunito Sans', sans-serif;
+      font-weight: 900;
+      font-size: clamp(3.5rem, 14vw, 15rem);
+      line-height: .88;
+      letter-spacing: -.03em;
+      color: #ffffff;
+      user-select: none;
+    }
+
+    .hero-title .line2 {
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      font-size: clamp(1rem, 2.8vw, 2rem);
+      letter-spacing: .25em;
+      line-height: 1;
+      margin-top: 1.4rem;
+      display: block;
+      color: #ffffff;
+      opacity: .75;
+    }
+
+    .hero-location {
+      position: relative;
+      z-index: 2;
+      margin-top: 2.5rem;
+      font-size: clamp(.55rem, 1.2vw, .75rem);
+      letter-spacing: .5em;
+      text-transform: uppercase;
+      color: #ffffff;
+      opacity: .5;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 0.8rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+      opacity: .45;
+      z-index: 2;
+      color: #ffffff;
+    }
+
+    .scroll-indicator span {
+      font-size: .55rem;
+      letter-spacing: .45em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 2.5rem;
+      background: #ffffff;
+      transform-origin: top;
+      animation: drip 2s ease-in-out infinite;
+    }
+
+    @keyframes drip {
+      0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+      50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      51%  { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+      100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+    }
+
+    /* ─── SECTION SHARED ─── */
+    .section-tag {
+      font-size: .6rem;
+      letter-spacing: .45em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-bottom: 3.5rem;
+    }
+
+    /* ─── HERO GENRES ─── */
+    .hero-genres {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: .5rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-genres span {
+      font-family: 'DM Mono', monospace;
+      font-size: .55rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.75);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: .35em .9em;
+      border-radius: 100px;
+    }
+
+    /* ─── TICKER ─── */
+    .ticker-wrap {
+      overflow: hidden;
+      border-top: 1px solid rgba(42,42,42,.08);
+      border-bottom: 1px solid rgba(42,42,42,.08);
+      padding: .7rem 0;
+      white-space: nowrap;
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      gap: 2rem;
+      animation: ticker 18s linear infinite;
+      font-family: 'DM Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--k3);
+    }
+
+    .ticker-track .dot { opacity: .35; }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ─── PLAYER ─── */
+    .player-section {
+      padding: 9rem 2rem 8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .player-ring-wrap {
+      position: relative;
+      width: 340px;
+      height: 340px;
+    }
+
+    /* Canvas sits centred, bigger than wrapper so bars can breathe outward */
+    #viz {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+
+    .player-orb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 200px;
+      height: 200px;
+      pointer-events: none;
+    }
+
+    .play-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 64px;
+      height: 64px;
+      border: 1.5px solid #ffffff;
+      border-radius: 50%;
+      background: transparent;
+      cursor: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: background .25s, border-color .25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .play-btn:hover {
+      background: #ffffff;
+    }
+
+    .play-btn:hover .ico { color: var(--k); }
+
+    .ico {
+      color: #ffffff;
+      font-size: 1rem;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .ico-pause { display: none; }
+
+    .playing .ico-play  { display: none; }
+    .playing .ico-pause { display: block; }
+
+    /* Track label */
+    .track-label {
+      margin-top: 2.8rem;
+      text-align: center;
+    }
+
+    .track-name {
+      font-family: 'DM Mono', monospace;
+      font-weight: 400;
+      font-size: clamp(.85rem, 2.2vw, 1.1rem);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .track-sub {
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      font-size: .6rem;
+      letter-spacing: .2em;
+      color: var(--k3);
+      margin-top: .5rem;
+    }
+
+    /* Progress bar */
+    .progress-area {
+      width: min(380px, 90vw);
+      margin-top: 2.5rem;
+    }
+
+    .prog-track {
+      width: 100%;
+      height: 28px;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Rail */
+    .prog-track::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: rgba(42,42,42,.1);
+      border-radius: 2px;
+      transition: height .2s;
+    }
+
+    .prog-track:hover::before { height: 3px; }
+
+    /* Fill */
+    .prog-fill {
+      position: absolute;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--y), var(--r));
+      border-radius: 2px;
+      transition: width .1s linear, height .2s;
+      pointer-events: none;
+    }
+
+    .prog-track:hover .prog-fill { height: 3px; }
+
+    /* Handle dot */
+    .prog-handle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--r);
+      border-radius: 50%;
+      transform: translateX(-50%) scale(0);
+      transition: transform .15s ease;
+      pointer-events: none;
+      top: 50%;
+      margin-top: -5px;
+    }
+
+    .prog-track:hover .prog-handle { transform: translateX(-50%) scale(1); }
+
+    /* Time tooltip */
+    .prog-tooltip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      background: var(--k);
+      color: var(--w);
+      font-size: .55rem;
+      letter-spacing: .08em;
+      padding: .25em .55em;
+      border-radius: 4px;
+      transform: translateX(-50%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+
+    .prog-track:hover .prog-tooltip { opacity: 1; }
+
+    .prog-times {
+      display: flex;
+      justify-content: space-between;
+      margin-top: .3rem;
+      font-size: .58rem;
+      color: var(--k3);
+      letter-spacing: .08em;
+    }
+
+    audio { display: none; }
+
+    ::placeholder { color: var(--k3); }
+    .field select option { background: #ffffff; color: var(--k); }
+
+    /* ─── EVENTS ─── */
+    .events-section {
+      padding: 8rem 2rem 9rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+    }
+
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      #cur, #ring { display: none; }
+      button, input, textarea, select, a { cursor: auto !important; }
+      .progress-area { width: min(220px, 70vw); }
+      .hero-title { font-size: clamp(3rem, 18vw, 7rem); }
+      .hero-title .line2 { font-size: clamp(.85rem, 3.8vw, 1.4rem); }
+      .player-section { padding: 5rem 1.5rem 5rem; }
+      .player-ring-wrap { width: 260px; height: 260px; }
+      .player-orb { width: 155px; height: 155px; }
+      .events-section { padding: 5rem 1.5rem 5rem; }
+      .events-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .booking-section { padding: 5rem 1.5rem 5rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .blob-1 { width: 90vw; height: 90vw; }
+      .blob-2 { width: 75vw; height: 75vw; }
+      .blob-3 { width: 60vw; height: 60vw; }
+      .social-strip { gap: .6rem; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-title { font-size: clamp(2.6rem, 20vw, 4.5rem); }
+      .player-ring-wrap { width: 220px; height: 220px; }
+      .player-orb { width: 130px; height: 130px; }
+      .social-strip { flex-direction: column; align-items: center; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+    }
+
+    .events-col-label {
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      font-size: .5rem;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-bottom: 2.2rem;
+    }
+
+    .event {
+      padding: 1.4rem 0;
+      border-top: 1px solid rgba(42,42,42,.1);
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 1.4rem;
+      align-items: start;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .6s ease, transform .6s ease, padding-left .25s;
+    }
+
+    .event:hover { padding-left: .5rem; }
+
+    .event.visible { opacity: 1; transform: translateY(0); }
+
+    .ev-day {
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      font-size: .7rem;
+      letter-spacing: .15em;
+      line-height: 1;
+      color: var(--k3);
+    }
+
+    .event.upcoming .ev-day {
+      font-family: 'Avenir Next', 'Avenir', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 0;
+      color: var(--r);
+    }
+
+    .ev-mon {
+      font-family: 'DM Mono', monospace;
+      font-size: .55rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-top: .3rem;
+    }
+
+    .event.upcoming .ev-mon {
+      margin-top: .25rem;
+    }
+
+    .ev-name {
+      font-family: 'Avenir Next', 'Avenir', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      letter-spacing: .04em;
+      line-height: 1.3;
+      color: var(--k);
+    }
+
+    .ev-venue {
+      font-size: .65rem;
+      color: var(--k2);
+      margin-top: .3rem;
+      letter-spacing: .08em;
+      line-height: 1.5;
+    }
+
+    .ev-badge {
+      display: inline-block;
+      font-size: .5rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      border: 1px solid var(--o);
+      color: var(--o);
+      padding: .18em .65em;
+      border-radius: 100px;
+      margin-top: .55rem;
+    }
+
+    /* ─── SOCIAL STRIP ─── */
+    .social-strip {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      font-size: .6rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--k);
+      border: 1px solid rgba(42,42,42,.18);
+      padding: .55em 1.1em;
+      border-radius: 100px;
+      transition: border-color .2s, color .2s, background .2s;
+      cursor: none;
+    }
+
+    .social-btn:hover {
+      background: var(--o);
+      color: var(--w);
+      border-color: var(--o);
+    }
+
+    .social-btn svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+    /* ─── BOOKING FORM ─── */
+    .booking-section {
+      padding: 8rem 2rem 9rem;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .booking-section .section-tag { margin-bottom: 1rem; }
+
+    .booking-intro {
+      font-family: 'Avenir Next', 'Avenir', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      margin-bottom: 3rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-bottom: 1.4rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    .field.visible { opacity: 1; transform: translateY(0); }
+
+    .field label {
+      font-size: .55rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--k3);
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(42,42,42,.18);
+      padding: .65rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: .8rem;
+      color: var(--k);
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+      cursor: none;
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-bottom-color: var(--o); }
+
+    .field textarea { resize: none; height: 100px; }
+
+    .field select { cursor: none; }
+
+    /* Style select option placeholder */
+    .field select option[value=""] { color: rgba(42,42,42,.3); }
+
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      background: var(--o);
+      color: var(--w);
+      border: none;
+      padding: .9rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      cursor: none;
+      border-radius: 100px;
+      transition: background .2s, transform .15s;
+      margin-top: .5rem;
+    }
+
+    .submit-btn:hover { background: var(--k); }
+    .submit-btn:active { transform: scale(.97); }
+
+    .submit-btn .arrow { transition: transform .2s; }
+    .submit-btn:hover .arrow { transform: translateX(4px); }
+
+    .form-note {
+      font-size: .58rem;
+      color: var(--k3);
+      letter-spacing: .1em;
+      margin-top: 1.2rem;
+      line-height: 1.6;
+    }
+
+    /* Success state */
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .form-success .check {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-success p {
+      font-family: 'Avenir Next', 'Avenir', 'Nunito Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: .04em;
+    }
+
+    .form-success small {
+      display: block;
+      font-size: .65rem;
+      opacity: .4;
+      margin-top: .5rem;
+      letter-spacing: .1em;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(42,42,42,.06);
+    }
+
+    .footer-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: .6rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--k3);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: .8rem;
+    }
+
+    .footer-social a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(42,42,42,.12);
+      border-radius: 50%;
+      color: var(--k);
+      opacity: .35;
+      transition: opacity .2s, border-color .2s;
+      cursor: none;
+    }
+
+    .footer-social a:hover { opacity: 1; border-color: var(--o); color: var(--o); }
+    .footer-social a svg { width: 12px; height: 12px; fill: currentColor; }
+
+    /* ─── PLAYER PULSE ─── */
+    #playerWrap .player-orb {
+      transition: filter .4s ease;
+    }
+    #playerWrap.playing .player-orb {
+      animation: orbPulse 2s ease-in-out infinite;
+    }
+    @keyframes orbPulse {
+      0%,100% { filter: drop-shadow(0 0 18px rgba(255,54,0,.35)); }
+      50%      { filter: drop-shadow(0 0 55px rgba(255,54,0,.75)); }
+    }
+
+    /* ─── EVENT CARD TILT ─── */
+    .event { transform-style: preserve-3d; }
+
+    /* ─── BACKGROUND BLOBS ─── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(90px);
+      will-change: transform;
+    }
+    .blob-1 {
+      width: 55vw; height: 55vw;
+      background: radial-gradient(circle, rgba(255,180,0,.13) 0%, transparent 70%);
+      top: -15vw; right: -10vw;
+      animation: blobDrift1 18s ease-in-out infinite alternate;
+    }
+    .blob-2 {
+      width: 45vw; height: 45vw;
+      background: radial-gradient(circle, rgba(255,54,0,.09) 0%, transparent 70%);
+      bottom: 10vh; left: -10vw;
+      animation: blobDrift2 22s ease-in-out infinite alternate;
+    }
+    .blob-3 {
+      width: 35vw; height: 35vw;
+      background: radial-gradient(circle, rgba(255,120,0,.07) 0%, transparent 70%);
+      top: 40vh; right: 5vw;
+      animation: blobDrift3 16s ease-in-out infinite alternate;
+    }
+    @keyframes blobDrift1 {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(-6vw, 8vh) scale(1.08); }
+    }
+    @keyframes blobDrift2 {
+      from { transform: translate(0,0) scale(1.05); }
+      to   { transform: translate(8vw, -6vh) scale(.95); }
+    }
+    @keyframes blobDrift3 {
+      from { transform: translate(0,0) scale(.95); }
+      to   { transform: translate(-5vw, -10vh) scale(1.1); }
+    }
+
+    /* ─── RIPPLE ─── */
+    @keyframes ripple {
+      to { transform: scale(1); opacity: 0; }
+    }
+
+    /* ─── INTRO FADE ─── */
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn .9s ease forwards;
+    }
+    .fade-in.d1 { animation-delay: .15s; }
+    .fade-in.d2 { animation-delay: .35s; }
+    .fade-in.d3 { animation-delay: .55s; }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cur"></div>
+  <div id="ring"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="orb-bg" id="orbBg">
+      <svg id="heroOrb" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="hg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#ffcf00"/>
+            <stop offset="35%"  stop-color="#ff3600"/>
+            <stop offset="70%"  stop-color="#ff3600" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#ff3600" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="540" cy="540" r="540" fill="url(#hg)"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-title fade-in d1">
+      MAISON<br>
+      82
+      <span class="line2">COLLECTIVE</span>
+    </h1>
+    <div class="hero-genres fade-in d2">
+      <span>House</span>
+      <span>Afro House</span>
+      <span>Tech House</span>
+    </div>
+
+    <div class="scroll-indicator fade-in d3">
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ─── PLAYER ─── -->
+  <section class="player-section">
+
+    <div class="player-ring-wrap" id="playerWrap">
+      <canvas id="viz"></canvas>
+
+      <svg class="player-orb" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="pg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#ffcf00"/>
+            <stop offset="50%"  stop-color="#ff3600"/>
+            <stop offset="90%"  stop-color="#ff3600" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="540" cy="540" r="540" fill="url(#pg)"/>
+      </svg>
+
+      <button class="play-btn" id="playBtn" aria-label="Play / Pause">
+        <span class="ico ico-play">&#9654;</span>
+        <span class="ico ico-pause">&#10074;&#10074;</span>
+      </button>
+    </div>
+
+    <div class="track-label">
+      <div class="track-name">Eau salée House Mix</div>
+      <div class="track-sub">Maison82collective</div>
+    </div>
+
+    <div class="progress-area">
+      <div class="prog-track" id="progTrack">
+        <div class="prog-fill" id="progFill"></div>
+        <div class="prog-handle" id="progHandle"></div>
+        <div class="prog-tooltip" id="progTooltip">0:00</div>
+      </div>
+      <div class="prog-times">
+        <span id="tElapsed">0:00</span>
+        <span id="tTotal">—:——</span>
+      </div>
+    </div>
+
+    <audio id="audioEl">
+      <source src="mix.m4a" type="audio/mp4">
+    </audio>
+  </section>
+
+  <!-- ─── EVENTS ─── -->
+  <section class="events-section">
+    <p class="section-tag">Events</p>
+
+    <div class="events-grid">
+      <!-- Upcoming -->
+      <div>
+        <div class="events-col-label">Upcoming</div>
+
+        <div class="event upcoming">
+          <div>
+            <div class="ev-day">13</div>
+            <div class="ev-mon">Mai 26</div>
+          </div>
+          <div>
+            <div class="ev-name">LSD PARTY</div>
+            <div class="ev-venue">Schüür Luzern</div>
+            <span class="ev-badge">Upcoming</span>
+          </div>
+        </div>
+
+        <div class="event upcoming">
+          <div>
+            <div class="ev-day">23</div>
+            <div class="ev-mon">Mai 26</div>
+          </div>
+          <div>
+            <div class="ev-name">DAYDANCE</div>
+            <div class="ev-venue">Seeburg &amp; Sunset Bar<br>by Timeless Tunes</div>
+            <span class="ev-badge">Upcoming</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past -->
+      <div>
+        <div class="events-col-label">Past</div>
+
+        <div class="event past">
+          <div>
+            <div class="ev-day">08</div>
+            <div class="ev-mon">Feb 26</div>
+          </div>
+          <div>
+            <div class="ev-name">BLAUHÄRD</div>
+            <div class="ev-venue">Zermatt</div>
+          </div>
+        </div>
+
+        <div class="event past">
+          <div>
+            <div class="ev-day">28</div>
+            <div class="ev-mon">Dez 25</div>
+          </div>
+          <div>
+            <div class="ev-name">RED CLUB</div>
+            <div class="ev-venue">Champéry</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── BOOKING ─── -->
+  <section class="booking-section" id="booking">
+    <p class="section-tag">Booking</p>
+    <p class="booking-intro">Book us for<br>your event.</p>
+
+    <form id="bookingForm" action="https://formspree.io/f/xzdkqkld" method="POST" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label for="f-name">Name</label>
+          <input id="f-name" name="name" type="text" placeholder="Dein Name" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="f-email">E-Mail</label>
+          <input id="f-email" name="email" type="email" placeholder="mail@example.com" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="f-date">Datum</label>
+          <input id="f-date" name="datum" type="date" />
+        </div>
+        <div class="field">
+          <label for="f-type">Event-Typ</label>
+          <select id="f-type" name="event_typ">
+            <option value="">— Auswählen</option>
+            <option value="Club Night">Club Night</option>
+            <option value="Daydance / Outdoor">Daydance / Outdoor</option>
+            <option value="Private Event">Private Event</option>
+            <option value="Festival">Festival</option>
+            <option value="Sonstiges">Sonstiges</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-venue">Location / Venue</label>
+        <input id="f-venue" name="venue" type="text" placeholder="Club, Bar, Adresse …" />
+      </div>
+
+      <div class="field">
+        <label for="f-msg">Nachricht</label>
+        <textarea id="f-msg" name="nachricht" placeholder="Weitere Infos, Gästezahl, Wünsche …"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        Anfrage senden <span class="arrow">→</span>
+      </button>
+
+    </form>
+
+    <div class="form-success" id="formSuccess">
+      <div class="check">✦</div>
+      <p>Anfrage gesendet.</p>
+      <small>Wir melden uns so schnell wie möglich.</small>
+    </div>
+
+    <!-- Social links below form -->
+    <div class="social-strip" style="margin-top:4rem;">
+      <a href="https://www.instagram.com/maison82collective" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">
+        <!-- Instagram icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Instagram
+      </a>
+      <a href="https://soundcloud.com/maison82collective" target="_blank" rel="noopener" class="social-btn" aria-label="SoundCloud">
+        <!-- SoundCloud icon -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.56 8.87V17h8.76c1.16-.01 2.09-.95 2.09-2.11a2.1 2.1 0 0 0-1.83-2.08 3.56 3.56 0 0 0-3.35-4.8 3.55 3.55 0 0 0-1.28.24 4.9 4.9 0 0 0-4.39-2.64c-.27 0-.54.02-.8.06V8.87zm-1.4 8.13H1.69A1.69 1.69 0 0 1 0 15.31c0-.75.5-1.4 1.19-1.62V13.5a3.5 3.5 0 0 1 3.5-3.5c.36 0 .7.05 1.03.15A4.1 4.1 0 0 1 9.5 7.9c.22 0 .44.02.66.05V17z"/></svg>
+        SoundCloud
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-copy">&copy; 2026 Maison82collective &nbsp;·&nbsp; Luzern</span>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/maison82collective" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="https://soundcloud.com/maison82collective" target="_blank" rel="noopener" aria-label="SoundCloud">
+          <svg viewBox="0 0 24 24"><path d="M11.56 8.87V17h8.76c1.16-.01 2.09-.95 2.09-2.11a2.1 2.1 0 0 0-1.83-2.08 3.56 3.56 0 0 0-3.35-4.8 3.55 3.55 0 0 0-1.28.24 4.9 4.9 0 0 0-4.39-2.64c-.27 0-.54.02-.8.06V8.87zm-1.4 8.13H1.69A1.69 1.69 0 0 1 0 15.31c0-.75.5-1.4 1.19-1.62V13.5a3.5 3.5 0 0 1 3.5-3.5c.36 0 .7.05 1.03.15A4.1 4.1 0 0 1 9.5 7.9c.22 0 .44.02.66.05V17z"/></svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ── CURSOR ── */
+    const cur  = document.getElementById('cur');
+    const ring = document.getElementById('ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cur.style.left = mx + 'px';
+      cur.style.top  = my + 'px';
+    });
+
+    (function tickRing() {
+      rx += (mx - rx) * .1;
+      ry += (my - ry) * .1;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(tickRing);
+    })();
+
+    /* ── HERO ORB PARALLAX ── */
+    const heroOrb = document.getElementById('heroOrb');
+    let orbTx = 0, orbTy = 0, orbTxT = 0, orbTyT = 0;
+
+    document.addEventListener('mousemove', e => {
+      orbTxT = (e.clientX / window.innerWidth  - .5) * 28;
+      orbTyT = (e.clientY / window.innerHeight - .5) * 28;
+    });
+
+    let orbScrollY = 0;
+    window.addEventListener('scroll', () => { orbScrollY = window.scrollY; }, { passive: true });
+
+    (function tickOrb() {
+      orbTx += (orbTxT - orbTx) * .05;
+      orbTy += (orbTyT - orbTy) * .05;
+      heroOrb.style.transform = `translate(${orbTx}px, ${orbTy + orbScrollY * 0.22}px)`;
+      requestAnimationFrame(tickOrb);
+    })();
+
+    /* ── AUDIO / VISUALISER ── */
+    const audio    = document.getElementById('audioEl');
+    const playBtn  = document.getElementById('playBtn');
+    const progFill = document.getElementById('progFill');
+    const progTrack= document.getElementById('progTrack');
+    const tElapsed = document.getElementById('tElapsed');
+    const tTotal   = document.getElementById('tTotal');
+    const canvas   = document.getElementById('viz');
+    const ctx2d    = canvas.getContext('2d');
+
+    // Retina canvas — we draw in CSS pixels, multiply by dpr
+    const DPR = window.devicePixelRatio || 1;
+    const CSS_SIZE = 480; // canvas CSS size
+    canvas.style.width  = CSS_SIZE + 'px';
+    canvas.style.height = CSS_SIZE + 'px';
+    canvas.width  = CSS_SIZE * DPR;
+    canvas.height = CSS_SIZE * DPR;
+    ctx2d.scale(DPR, DPR);
+
+    const CX = CSS_SIZE / 2;      // centre in CSS px
+    const CY = CSS_SIZE / 2;
+    const ORB_R = 95;              // matches .player-orb 200px → radius 100px, ~95 with gap
+
+    let audioCtx = null, analyser = null;
+    let isPlaying = false;
+    let rafId = null;
+
+    function fmt(s) {
+      const m = Math.floor(s / 60);
+      return `${m}:${String(Math.floor(s % 60)).padStart(2,'0')}`;
+    }
+
+    function initAudio() {
+      if (audioCtx) return;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AC();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = .82;
+      const src = audioCtx.createMediaElementSource(audio);
+      src.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
+
+    /* Single draw loop — handles both idle shimmer and live visualiser */
+    const freqData = new Uint8Array(256);
+    const BAR_COUNT = 128;
+
+    function draw(ts) {
+      rafId = requestAnimationFrame(draw);
+      ctx2d.clearRect(0, 0, CSS_SIZE, CSS_SIZE);
+
+      /* ── Frequency bars (or idle wave) ── */
+      if (analyser) analyser.getByteFrequencyData(freqData);
+
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const angle = (i / BAR_COUNT) * Math.PI * 2 - Math.PI / 2;
+
+        let val;
+        if (analyser && isPlaying) {
+          const idx = Math.floor((i / BAR_COUNT) * freqData.length * .65);
+          val = freqData[idx] / 255;
+        } else {
+          // Idle shimmer
+          val = (Math.sin(i * .19 + ts * .0012) * .5 + .5) * .2 + .03;
+        }
+
+        const barH = val * (isPlaying ? 90 : 18);
+        const x1 = CX + Math.cos(angle) * ORB_R;
+        const y1 = CY + Math.sin(angle) * ORB_R;
+        const x2 = CX + Math.cos(angle) * (ORB_R + barH);
+        const y2 = CY + Math.sin(angle) * (ORB_R + barH);
+
+        // Colour: yellow → red along circumference
+        const t = i / BAR_COUNT;
+        const r = 255;
+        const g = Math.round(207 * Math.max(0, 1 - t * 2));
+        const b = 0;
+        const alpha = isPlaying ? (.25 + val * .75) : .1;
+
+        ctx2d.beginPath();
+        ctx2d.moveTo(x1, y1);
+        ctx2d.lineTo(x2, y2);
+        ctx2d.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+        ctx2d.lineWidth = isPlaying ? 2.5 : 1.5;
+        ctx2d.lineCap = 'round';
+        ctx2d.stroke();
+      }
+
+      /* ── Circular progress ring ── */
+      const progress = (audio.duration && !isNaN(audio.duration))
+        ? audio.currentTime / audio.duration : 0;
+
+      if (progress > 0) {
+        ctx2d.beginPath();
+        ctx2d.arc(CX, CY, ORB_R - 6, -Math.PI/2, -Math.PI/2 + progress * Math.PI * 2);
+        ctx2d.strokeStyle = 'rgba(255,54,0,.45)';
+        ctx2d.lineWidth = 1.5;
+        ctx2d.stroke();
+      }
+    }
+
+    draw(0); // start idle immediately
+
+    /* ── Play / Pause ── */
+    playBtn.addEventListener('click', async () => {
+      initAudio();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+      if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        playBtn.classList.remove('playing');
+        playerWrap.classList.remove('playing');
+      } else {
+        try {
+          await audio.play();
+          isPlaying = true;
+          playBtn.classList.add('playing');
+          playerWrap.classList.add('playing');
+        } catch(e) {
+          console.warn('Playback failed:', e);
+        }
+      }
+    });
+
+    const progHandle  = document.getElementById('progHandle');
+    const progTooltip = document.getElementById('progTooltip');
+
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      const pct = audio.currentTime / audio.duration * 100;
+      progFill.style.width = pct + '%';
+      progHandle.style.left = pct + '%';
+      tElapsed.textContent = fmt(audio.currentTime);
+    });
+
+    progTrack.addEventListener('mousemove', e => {
+      const { left, width } = progTrack.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - left) / width));
+      const hoverTime = pct * (audio.duration || 0);
+      progTooltip.textContent = fmt(hoverTime);
+      progTooltip.style.left = (pct * 100) + '%';
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+      tTotal.textContent = fmt(audio.duration);
+    });
+
+    audio.addEventListener('ended', () => {
+      isPlaying = false;
+      playBtn.classList.remove('playing');
+    });
+
+    function seek(e) {
+      if (!audio.duration) return;
+      const { left, width } = progTrack.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - left) / width));
+      audio.currentTime = pct * audio.duration;
+    }
+
+    let dragging = false;
+    progTrack.addEventListener('mousedown', e => { dragging = true; seek(e); });
+    document.addEventListener('mousemove', e => { if (dragging) seek(e); });
+    document.addEventListener('mouseup', () => { dragging = false; });
+    progTrack.addEventListener('touchstart', e => { seek(e.touches[0]); }, { passive: true });
+    progTrack.addEventListener('touchmove',  e => { seek(e.touches[0]); }, { passive: true });
+
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+
+    if (!isTouchDevice) {
+      /* ── CURSOR TRAIL ── */
+      const TRAIL_N = 10;
+      const trailDots = Array.from({ length: TRAIL_N }, (_, i) => {
+        const d = document.createElement('div');
+        const s = Math.max(2, 5 - i * 0.35);
+        d.style.cssText = `position:fixed;width:${s}px;height:${s}px;border-radius:50%;
+          pointer-events:none;z-index:9990;transform:translate(-50%,-50%);
+          background:rgba(255,54,0,${0.55 - i * 0.05});mix-blend-mode:multiply;`;
+        document.body.appendChild(d);
+        return { el: d, x: mx, y: my };
+      });
+
+      (function animTrail() {
+        trailDots.forEach((dot, i) => {
+          const src = i === 0 ? { x: mx, y: my } : trailDots[i - 1];
+          dot.x += (src.x - dot.x) * (0.28 - i * 0.018);
+          dot.y += (src.y - dot.y) * (0.28 - i * 0.018);
+          dot.el.style.left = dot.x + 'px';
+          dot.el.style.top  = dot.y + 'px';
+        });
+        requestAnimationFrame(animTrail);
+      })();
+
+      /* ── NOISE GRAIN OVERLAY ── */
+      const noiseEl = document.createElement('div');
+      noiseEl.style.cssText = `position:fixed;inset:0;pointer-events:none;z-index:9500;opacity:.04;
+        background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 180px;`;
+      document.body.appendChild(noiseEl);
+
+      /* ── MAGNETIC BUTTONS ── */
+      document.querySelectorAll('.submit-btn, .social-btn').forEach(el => {
+        el.style.transition = 'transform .35s cubic-bezier(.23,1,.32,1), background .2s';
+        el.addEventListener('mousemove', e => {
+          const r = el.getBoundingClientRect();
+          const dx = (e.clientX - (r.left + r.width  / 2)) * 0.32;
+          const dy = (e.clientY - (r.top  + r.height / 2)) * 0.32;
+          el.style.transform = `translate(${dx}px,${dy}px)`;
+        });
+        el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+      });
+
+      /* ── PLAY BTN MAGNETIC ── */
+      playBtn.style.transition = 'background .25s, border-color .25s, transform .35s cubic-bezier(.23,1,.32,1)';
+      playBtn.addEventListener('mousemove', e => {
+        const r = playBtn.getBoundingClientRect();
+        const dx = (e.clientX - (r.left + r.width  / 2)) * 0.25;
+        const dy = (e.clientY - (r.top  + r.height / 2)) * 0.25;
+        playBtn.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      });
+      playBtn.addEventListener('mouseleave', () => {
+        playBtn.style.transform = 'translate(-50%,-50%)';
+      });
+
+      /* ── CARD 3D TILT ── */
+      document.querySelectorAll('.event').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width  - 0.5;
+          const y = (e.clientY - r.top)  / r.height - 0.5;
+          card.style.transition = 'transform .08s ease, padding-left .25s';
+          card.style.transform  = `perspective(900px) rotateY(${x*7}deg) rotateX(${-y*7}deg) translateZ(6px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transition = 'transform .55s cubic-bezier(.23,1,.32,1), opacity .6s ease, padding-left .25s';
+          card.style.transform  = '';
+        });
+      });
+
+      /* ── SPOTLIGHT ── */
+      const spotlight = document.createElement('div');
+      spotlight.style.cssText = `position:fixed;inset:0;pointer-events:none;z-index:1;
+        background:radial-gradient(600px circle at -9999px -9999px, rgba(255,90,0,.07) 0%, transparent 65%);`;
+      document.body.appendChild(spotlight);
+
+      document.addEventListener('mousemove', e => {
+        spotlight.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(255,90,0,.07) 0%, transparent 65%)`;
+      });
+      document.addEventListener('mouseleave', () => {
+        spotlight.style.background = `radial-gradient(600px circle at -9999px -9999px, rgba(255,90,0,.07) 0%, transparent 65%)`;
+      });
+    }
+
+    /* ── COUNT-UP on event dates when visible ── */
+    document.querySelectorAll('.ev-day').forEach(el => {
+      const target = parseInt(el.textContent, 10);
+      if (isNaN(target)) return;
+      el.textContent = '00';
+      const countObs = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        countObs.unobserve(el);
+        let cur = 0;
+        const step = () => {
+          cur = Math.min(target, cur + Math.ceil((target - cur) / 4 + 0.5));
+          el.textContent = String(cur).padStart(2, '0');
+          if (cur < target) requestAnimationFrame(step);
+        };
+        setTimeout(step, 120);
+      }, { threshold: .5 });
+      countObs.observe(el);
+    });
+
+    /* ── RIPPLE on buttons ── */
+    function addRipple(btn) {
+      btn.style.position = 'relative';
+      btn.style.overflow = 'hidden';
+      btn.addEventListener('click', e => {
+        const r = btn.getBoundingClientRect();
+        const rip = document.createElement('span');
+        const size = Math.max(r.width, r.height) * 2;
+        rip.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;
+          background:rgba(255,255,255,.25);transform:scale(0);pointer-events:none;
+          left:${e.clientX - r.left - size/2}px;top:${e.clientY - r.top - size/2}px;
+          animation:ripple .55s ease-out forwards;`;
+        btn.appendChild(rip);
+        setTimeout(() => rip.remove(), 600);
+      });
+    }
+    document.querySelectorAll('.submit-btn, .play-btn, .social-btn').forEach(addRipple);
+
+    /* ── STAGGERED SCROLL PARALLAX on event items ── */
+    const evItems = document.querySelectorAll('.event');
+    window.addEventListener('scroll', () => {
+      evItems.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const mid = r.top + r.height / 2 - window.innerHeight / 2;
+        const shift = mid * (i % 2 === 0 ? 0.03 : -0.03);
+        if (el.matches(':hover')) return;
+        el.style.transform = `translateY(${shift}px)`;
+      });
+    }, { passive: true });
+
+    /* ── PLAYER ORB PULSE WHEN PLAYING ── */
+    const playerWrap = document.getElementById('playerWrap');
+
+    /* ── SCROLL REVEAL ── */
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach((en, i) => {
+        if (en.isIntersecting) {
+          setTimeout(() => en.target.classList.add('visible'), i * 80);
+          obs.unobserve(en.target);
+        }
+      });
+    }, { threshold: .12 });
+
+    document.querySelectorAll('.event, .field').forEach(el => obs.observe(el));
+
+    /* ── Cursor ring expand on interactive elements ── */
+    document.querySelectorAll('button, .prog-track, .social-btn, input, textarea, select, a').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width  = '56px';
+        ring.style.height = '56px';
+        ring.style.borderColor = 'rgba(255,54,0,.5)';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width  = '36px';
+        ring.style.height = '36px';
+        ring.style.borderColor = 'rgba(42,42,42,.25)';
+      });
+    });
+
+    /* ── BOOKING FORM — mailto ── */
+    const form        = document.getElementById('bookingForm');
+    const formSuccess = document.getElementById('formSuccess');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const name  = document.getElementById('f-name').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+
+      if (!name || !email) {
+        if (!name)  document.getElementById('f-name').style.borderBottomColor  = 'var(--r)';
+        if (!email) document.getElementById('f-email').style.borderBottomColor = 'var(--r)';
+        return;
+      }
+
+      const submitBtn = form.querySelector('.submit-btn');
+      submitBtn.textContent = '…';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          form.style.display = 'none';
+          formSuccess.style.display = 'block';
+        } else {
+          submitBtn.textContent = 'Fehler — nochmal versuchen →';
+          submitBtn.disabled = false;
+        }
+      } catch {
+        submitBtn.textContent = 'Fehler — nochmal versuchen →';
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Reset red borders on input
+    ['f-name','f-email'].forEach(id => {
+      document.getElementById(id).addEventListener('input', function() {
+        this.style.borderBottomColor = '';
+      });
+    });
+  </script>
+</body>
+</html>
