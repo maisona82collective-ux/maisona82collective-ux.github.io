@@ -464,8 +464,9 @@
       .progress-area { width: min(220px, 72vw); }
 
       /* Countdown */
-      .countdown-wrap { gap: 1rem; margin: 2rem 0 2.5rem; }
-      .countdown-sep { font-size: 1.4rem; }
+      .countdown-wrap { gap: 0.9rem; margin: 2rem 0 2.5rem; }
+      .countdown-num { font-size: clamp(1.4rem, 5.5vw, 2.5rem); }
+      .countdown-sep { font-size: 1.2rem; }
 
       /* Events */
       .events-section { padding: 5rem 1.5rem 5rem; }
@@ -493,12 +494,12 @@
       .player-orb { width: 130px; height: 130px; }
       .progress-area { width: min(200px, 78vw); }
 
-      /* Countdown — prevent overflow on small screens */
-      .countdown-wrap { gap: 0.7rem; margin: 1.8rem 0 2.2rem; }
-      .countdown-num { font-size: clamp(1.5rem, 8.5vw, 2.2rem); }
-      .countdown-sep { font-size: 1.1rem; line-height: 1.7; }
-      .countdown-label { font-size: .45rem; }
-      .countdown-event-name { font-size: .5rem; letter-spacing: .2em; }
+      /* Countdown — single row, no wrap */
+      .countdown-wrap { gap: 0.5rem; margin: 1.8rem 0 2.2rem; }
+      .countdown-num { font-size: clamp(1.3rem, 7vw, 1.8rem); }
+      .countdown-sep { font-size: 1rem; line-height: 1.7; }
+      .countdown-label { font-size: .42rem; }
+      .countdown-event-name { font-size: .48rem; letter-spacing: .18em; }
 
       /* Events */
       .events-section { padding: 4rem 1.2rem 4rem; }
@@ -604,7 +605,6 @@
     /* ─── COUNTDOWN ─── */
     .countdown-wrap {
       display: flex;
-      flex-wrap: wrap;
       gap: 1.8rem;
       margin: 2.5rem 0 3rem;
       align-items: flex-end;
