@@ -254,6 +254,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow: hidden;
     }
 
     .player-ring-wrap {
@@ -450,26 +451,69 @@
       body { cursor: auto; }
       #cur, #ring { display: none; }
       button, input, textarea, select, a { cursor: auto !important; }
-      .progress-area { width: min(220px, 70vw); }
+
+      /* Hero */
       .hero-title { font-size: clamp(3rem, 18vw, 7rem); }
       .hero-title .line2 { font-size: clamp(.85rem, 3.8vw, 1.4rem); }
+      .hero-location { font-size: .55rem; letter-spacing: .35em; }
+
+      /* Player */
       .player-section { padding: 5rem 1.5rem 5rem; }
       .player-ring-wrap { width: 260px; height: 260px; }
       .player-orb { width: 155px; height: 155px; }
+      .progress-area { width: min(220px, 72vw); }
+
+      /* Countdown */
+      .countdown-wrap { gap: 1rem; margin: 2rem 0 2.5rem; }
+      .countdown-sep { font-size: 1.4rem; }
+
+      /* Events */
       .events-section { padding: 5rem 1.5rem 5rem; }
       .events-grid { grid-template-columns: 1fr; gap: 3rem; }
+
+      /* Booking */
       .booking-section { padding: 5rem 1.5rem 5rem; }
       .form-row { grid-template-columns: 1fr; }
+      .booking-intro { font-size: clamp(1.3rem, 5vw, 1.8rem); }
 
-      .social-strip { gap: .6rem; }
+      /* Social */
+      .social-strip { gap: .6rem; flex-wrap: wrap; justify-content: center; }
+
+      /* Footer */
+      .footer-inner { gap: .8rem; }
     }
 
     @media (max-width: 480px) {
+      /* Hero */
       .hero-title { font-size: clamp(2.6rem, 20vw, 4.5rem); }
+      .hero-genres span { font-size: .5rem; padding: .3em .7em; }
+
+      /* Player */
       .player-ring-wrap { width: 220px; height: 220px; }
       .player-orb { width: 130px; height: 130px; }
+      .progress-area { width: min(200px, 78vw); }
+
+      /* Countdown — prevent overflow on small screens */
+      .countdown-wrap { gap: 0.7rem; margin: 1.8rem 0 2.2rem; }
+      .countdown-num { font-size: clamp(1.5rem, 8.5vw, 2.2rem); }
+      .countdown-sep { font-size: 1.1rem; line-height: 1.7; }
+      .countdown-label { font-size: .45rem; }
+      .countdown-event-name { font-size: .5rem; letter-spacing: .2em; }
+
+      /* Events */
+      .events-section { padding: 4rem 1.2rem 4rem; }
+      .cal-btn { font-size: .45rem; }
+
+      /* Booking */
+      .booking-section { padding: 4rem 1.2rem 4rem; }
+
+      /* Social */
       .social-strip { flex-direction: column; align-items: center; }
+      .social-btn { font-size: .55rem; }
+
+      /* Footer */
       .footer-inner { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+      footer { padding: 2.5rem 1.2rem; }
     }
 
     .events-col-label {
@@ -560,6 +604,7 @@
     /* ─── COUNTDOWN ─── */
     .countdown-wrap {
       display: flex;
+      flex-wrap: wrap;
       gap: 1.8rem;
       margin: 2.5rem 0 3rem;
       align-items: flex-end;
@@ -1280,9 +1325,9 @@
     const canvas   = document.getElementById('viz');
     const ctx2d    = canvas.getContext('2d');
 
-    // Retina canvas — we draw in CSS pixels, multiply by dpr
+    // Retina canvas — responsive so it never overflows on mobile
     const DPR = window.devicePixelRatio || 1;
-    const CSS_SIZE = 480; // canvas CSS size
+    const CSS_SIZE = Math.min(480, window.innerWidth * 0.92);
     canvas.style.width  = CSS_SIZE + 'px';
     canvas.style.height = CSS_SIZE + 'px';
     canvas.width  = CSS_SIZE * DPR;
