@@ -559,6 +559,64 @@
       margin-top: .55rem;
     }
 
+    /* ─── COUNTDOWN ─── */
+    .countdown-wrap {
+      display: flex;
+      gap: 1.8rem;
+      margin: 2.5rem 0 3rem;
+      align-items: flex-end;
+    }
+    .countdown-unit { text-align: center; }
+    .countdown-num {
+      font-family: 'Avenir', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      color: var(--r);
+      line-height: 1;
+      letter-spacing: -.02em;
+    }
+    .countdown-label {
+      font-size: .5rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-top: .3rem;
+    }
+    .countdown-sep {
+      font-size: 2rem;
+      color: rgba(42,42,42,.12);
+      line-height: 1.4;
+      font-weight: 300;
+    }
+    .countdown-event-name {
+      font-size: .55rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-bottom: .8rem;
+    }
+
+    /* ─── CAL BUTTON ─── */
+    .cal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .6rem;
+      font-size: .5rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--k3);
+      border: 1px solid rgba(42,42,42,.12);
+      border-radius: 100px;
+      padding: .25em .75em;
+      background: none;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+      text-decoration: none;
+    }
+    .cal-btn:hover { color: var(--o); border-color: var(--o); }
+    .cal-btn svg { width: 9px; height: 9px; fill: currentColor; flex-shrink: 0; }
+
     /* ─── SOCIAL STRIP ─── */
     .social-strip {
       display: flex;
@@ -1007,6 +1065,20 @@
   <section class="events-section">
     <p class="section-tag">Events</p>
 
+    <!-- Countdown -->
+    <div>
+      <div class="countdown-event-name">Next Event — LSD Party · Schüür Luzern</div>
+      <div class="countdown-wrap">
+        <div class="countdown-unit"><div class="countdown-num" id="cd-days">--</div><div class="countdown-label">Days</div></div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit"><div class="countdown-num" id="cd-hours">--</div><div class="countdown-label">Hours</div></div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit"><div class="countdown-num" id="cd-mins">--</div><div class="countdown-label">Min</div></div>
+        <div class="countdown-sep">·</div>
+        <div class="countdown-unit"><div class="countdown-num" id="cd-secs">--</div><div class="countdown-label">Sec</div></div>
+      </div>
+    </div>
+
     <div class="events-grid">
       <!-- Upcoming -->
       <div>
@@ -1021,6 +1093,7 @@
             <div class="ev-name">LSD PARTY</div>
             <div class="ev-venue">Schüür Luzern</div>
             <span class="ev-badge">Upcoming</span>
+            <br><a class="cal-btn" href="data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART:20260513T200000Z%0ADTEND:20260514T040000Z%0ASUMMARY:LSD Party — Maison82collective%0ALOCATION:Schüür Luzern%0AEND:VEVENT%0AEND:VCALENDAR" download="lsd-party.ics"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H5V8h14v13z"/></svg>Add to calendar</a>
           </div>
         </div>
 
@@ -1033,6 +1106,7 @@
             <div class="ev-name">DAYDANCE</div>
             <div class="ev-venue">Seeburg &amp; Sunset Bar<br>by Timeless Tunes</div>
             <span class="ev-badge">Upcoming</span>
+            <br><a class="cal-btn" href="data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART:20260523T140000Z%0ADTEND:20260523T220000Z%0ASUMMARY:Daydance — Maison82collective%0ALOCATION:Seeburg %26 Sunset Bar%2C Luzern%0AEND:VEVENT%0AEND:VCALENDAR" download="daydance.ics"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H5V8h14v13z"/></svg>Add to calendar</a>
           </div>
         </div>
       </div>
@@ -1517,6 +1591,45 @@
       });
     }
     document.querySelectorAll('.submit-btn, .play-btn, .social-btn').forEach(addRipple);
+
+    /* ── COUNTDOWN ── */
+    (function tickCountdown() {
+      const target = new Date('2026-05-13T20:00:00+02:00');
+      function update() {
+        const diff = target - Date.now();
+        if (diff <= 0) {
+          ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
+          return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
+        document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+        document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
+        document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+      }
+      update();
+      setInterval(update, 1000);
+    })();
+
+    /* ── BEAT-REACTIVE HERO ORB ── */
+    const heroOrb = document.getElementById('heroOrb');
+    let beatScale = 1;
+    (function beatLoop() {
+      if (analyser && isPlaying) {
+        const bass = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(bass);
+        const avg = (bass[1] + bass[2] + bass[3] + bass[4] + bass[5]) / 5 / 255;
+        const target = 1 + avg * 0.08;
+        beatScale += (target - beatScale) * 0.15;
+      } else {
+        beatScale += (1 - beatScale) * 0.05;
+      }
+      heroOrb.style.transform = `scale(${beatScale})`;
+      requestAnimationFrame(beatLoop);
+    })();
 
     /* ── STAGGERED SCROLL PARALLAX on event items ── */
     const evItems = document.querySelectorAll('.event');
