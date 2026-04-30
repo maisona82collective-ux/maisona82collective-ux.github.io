@@ -363,6 +363,133 @@
       border-radius: 100px;
     }
 
+    /* ─── TECHNICAL RIDER ─── */
+    .rider-section {
+      padding: 8rem 2rem 9rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .rider-img-wrap {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 2.5rem 0 3.5rem;
+    }
+
+    .rider-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .rider-section > div[data-reveal] {
+      margin-bottom: 2.5rem;
+    }
+
+    .rider-col-label {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: .5rem;
+      letter-spacing: .4em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ─── RIDER CARDS ─── */
+    .rider-cards {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: .7rem;
+      margin-bottom: 1.8rem;
+    }
+
+    @media (max-width: 560px) {
+      .rider-cards { grid-template-columns: 1fr; }
+    }
+
+    .rider-card {
+      position: relative;
+      border: 1px solid rgba(42,42,42,.11);
+      border-radius: 10px;
+      padding: 1.2rem 1.1rem 1rem;
+      cursor: default;
+      transition: border-color .3s ease, transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s ease;
+      overflow: hidden;
+    }
+
+    .rider-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--y), var(--r));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+    }
+
+    .rider-card:hover {
+      border-color: rgba(42,42,42,.22);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.07);
+    }
+
+    .rider-card:hover::before { transform: scaleX(1); }
+
+    .rider-card.is-mixer {
+      border-color: rgba(255,54,0,.18);
+      background: rgba(255,54,0,.02);
+    }
+
+    .rider-card-pos {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: .44rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--k3);
+      margin-bottom: .9rem;
+    }
+
+    .rider-card.is-mixer .rider-card-pos { color: var(--r); }
+
+    .rider-card-name {
+      font-family: 'Avenir Next', 'Avenir', sans-serif;
+      font-weight: 700;
+      font-size: clamp(.85rem, 2vw, 1.05rem);
+      letter-spacing: -.01em;
+      color: var(--k);
+      line-height: 1.15;
+    }
+
+    .rider-card-brand {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: .44rem;
+      letter-spacing: .18em;
+      color: var(--k3);
+      margin-top: .35rem;
+    }
+
+    .rider-note {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: .62rem;
+      letter-spacing: .08em;
+      color: var(--k3);
+      line-height: 1.85;
+    }
+
+    .rider-note strong {
+      color: var(--k2);
+      font-weight: 400;
+    }
+
+    .rider-note .rider-note-opt {
+      display: block;
+      margin-top: .5rem;
+      color: var(--k3);
+      opacity: .7;
+    }
+
     /* ─── TICKER ─── */
     .ticker-wrap {
       overflow: hidden;
@@ -506,6 +633,7 @@
       cursor: none;
       text-align: left;
       transition: border-color .22s, background .22s, transform .3s cubic-bezier(.16,1,.3,1);
+      -webkit-tap-highlight-color: transparent;
     }
 
     .track-pill:not(.active):hover {
@@ -692,7 +820,13 @@
       .player-section { padding: 5rem 1.5rem 5rem; }
       .player-ring-wrap { width: 260px; height: 260px; }
       .player-orb { width: 155px; height: 155px; }
-      .progress-area { width: min(220px, 72vw); }
+      .progress-area { width: min(340px, 86vw); }
+
+      /* Progress bar — always visible on touch, bigger tap area */
+      .prog-track { height: 36px; }
+      .prog-track::before { height: 3px; }
+      .prog-fill { height: 3px; }
+      .prog-handle { transform: translateX(-50%) scale(1); width: 13px; height: 13px; margin-top: -6.5px; }
 
       /* Countdown */
       .countdown-wrap { gap: 1.2rem; margin: 2rem 0 2.5rem; }
@@ -702,6 +836,10 @@
       /* Events */
       .events-section { padding: 5rem 1.5rem 5rem; }
       .events-grid { grid-template-columns: 1fr; gap: 3rem; }
+
+      /* Rider */
+      .rider-section { padding: 5rem 1.5rem 6rem; }
+      .rider-cards { gap: .5rem; }
 
       /* Booking */
       .booking-section { padding: 5rem 1.5rem 5rem; }
@@ -723,7 +861,8 @@
       /* Player */
       .player-ring-wrap { width: 220px; height: 220px; }
       .player-orb { width: 130px; height: 130px; }
-      .progress-area { width: min(200px, 78vw); }
+      .progress-area { width: min(300px, 88vw); }
+      .track-switcher { width: min(300px, 88vw); }
 
       /* Countdown — single row */
       .countdown-wrap { gap: 1rem; margin: 1.8rem 0 2.2rem; }
@@ -1565,7 +1704,7 @@
       </div>
     </div>
 
-    <audio id="audioEl">
+    <audio id="audioEl" playsinline preload="metadata">
       <source src="mix.m4a" type="audio/mp4">
     </audio>
   </section>
@@ -1649,10 +1788,47 @@
     </div>
   </section>
 
+  <!-- ─── TECHNICAL RIDER ─── -->
+  <section class="rider-section" id="rider">
+    <h2 class="section-tag" data-reveal="left">Technical Rider</h2>
+
+    <div class="rider-img-wrap" data-reveal="scale" data-delay="0.05">
+      <img src="rider.png" alt="Pioneer CDJ-3000X & DJM-V10 — Maison82collective Technical Rider" loading="lazy" />
+    </div>
+
+    <div class="rider-cards" data-reveal="up" data-delay="0.08">
+
+      <div class="rider-card">
+        <div class="rider-card-pos">Deck 1</div>
+        <div class="rider-card-name">CDJ-3000X</div>
+        <div class="rider-card-brand">Pioneer DJ</div>
+      </div>
+
+      <div class="rider-card is-mixer">
+        <div class="rider-card-pos">Mixer</div>
+        <div class="rider-card-name">DJM-V10</div>
+        <div class="rider-card-brand">Pioneer DJ</div>
+      </div>
+
+      <div class="rider-card">
+        <div class="rider-card-pos">Deck 2</div>
+        <div class="rider-card-name">CDJ-3000X</div>
+        <div class="rider-card-brand">Pioneer DJ</div>
+      </div>
+
+    </div>
+
+    <p class="rider-note" data-reveal="up" data-delay="0.14">
+      All equipment to be provided by the venue.<br>
+      <strong>Accepted alternatives:</strong> CDJ-3000 · DJM-A9
+      <span class="rider-note-opt">3-deck setup welcome if available.</span>
+    </p>
+  </section>
+
   <!-- ─── BOOKING ─── -->
   <section class="booking-section" id="booking">
     <h2 class="section-tag">Booking</h2>
-    <p class="booking-intro">Bucht uns für<br>euren Event.</p>
+    <p class="booking-intro">Book us for<br>your event.</p>
 
     <form id="bookingForm" action="https://formspree.io/f/xzdkqkld" method="POST" novalidate>
       <div class="form-row">
@@ -1837,18 +2013,26 @@
     const canvas   = document.getElementById('viz');
     const ctx2d    = canvas.getContext('2d');
 
-    // Retina canvas — responsive so it never overflows on mobile
+    // Retina canvas — responsive, resizes on orientation change
     const DPR = window.devicePixelRatio || 1;
-    const CSS_SIZE = Math.min(480, window.innerWidth * 0.92);
-    canvas.style.width  = CSS_SIZE + 'px';
-    canvas.style.height = CSS_SIZE + 'px';
-    canvas.width  = CSS_SIZE * DPR;
-    canvas.height = CSS_SIZE * DPR;
-    ctx2d.scale(DPR, DPR);
+    let CSS_SIZE = Math.min(480, window.innerWidth * 0.92);
+    let CX = CSS_SIZE / 2;
+    let CY = CSS_SIZE / 2;
+    let ORB_R = CSS_SIZE < 260 ? 65 : CSS_SIZE < 300 ? 78 : 95;
 
-    const CX = CSS_SIZE / 2;      // centre in CSS px
-    const CY = CSS_SIZE / 2;
-    const ORB_R = 95;              // matches .player-orb 200px → radius 100px, ~95 with gap
+    function resizeViz() {
+      CSS_SIZE = Math.min(480, window.innerWidth * 0.92);
+      CX = CSS_SIZE / 2;
+      CY = CSS_SIZE / 2;
+      ORB_R = CSS_SIZE < 260 ? 65 : CSS_SIZE < 300 ? 78 : 95;
+      canvas.style.width  = CSS_SIZE + 'px';
+      canvas.style.height = CSS_SIZE + 'px';
+      canvas.width  = CSS_SIZE * DPR;
+      canvas.height = CSS_SIZE * DPR;
+      ctx2d.scale(DPR, DPR);
+    }
+    resizeViz();
+    window.addEventListener('resize', resizeViz, { passive: true });
 
     let audioCtx = null, analyser = null;
     let isPlaying = false;
