@@ -73,8 +73,6 @@
     }
 
     html {
-      scroll-behavior: smooth;
-      overflow-x: hidden;
       width: 100%;
     }
 
@@ -331,6 +329,7 @@
       font-size: clamp(.85rem, 2.2vw, 1.1rem);
       letter-spacing: .18em;
       text-transform: uppercase;
+      transition: opacity .2s ease;
     }
 
     .track-sub {
@@ -340,6 +339,94 @@
       letter-spacing: .2em;
       color: var(--k3);
       margin-top: .5rem;
+    }
+
+    /* ─── TRACK SWITCHER ─── */
+    .track-switcher {
+      margin-top: 2.2rem;
+      width: min(380px, 90vw);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .6rem;
+    }
+
+    .track-pill {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: .45rem .6rem .4rem;
+      border: 1px solid rgba(42,42,42,.12);
+      border-radius: 7px;
+      background: none;
+      cursor: none;
+      text-align: left;
+      transition: border-color .22s, background .22s, transform .3s cubic-bezier(.16,1,.3,1);
+    }
+
+    .track-pill:not(.active):hover {
+      border-color: rgba(42,42,42,.28);
+      transform: translateY(-2px);
+    }
+
+    .track-pill.active { background: rgba(255,54,0,.03); border-color: rgba(42,42,42,.18); }
+
+    /* playing dot — top right */
+    .track-pill-dot {
+      position: absolute;
+      top: .55rem;
+      right: .55rem;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(42,42,42,.12);
+      transition: background .25s;
+    }
+
+    .track-pill.active.now-playing .track-pill-dot {
+      background: var(--r);
+      animation: dotPulse 1s ease-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%   { box-shadow: 0 0 0 0   rgba(255,54,0,.55); }
+      70%  { box-shadow: 0 0 0 6px rgba(255,54,0,0); }
+      100% { box-shadow: 0 0 0 0   rgba(255,54,0,0); }
+    }
+
+    /* index number */
+    .track-pill-num {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: .42rem;
+      letter-spacing: .22em;
+      color: var(--k3);
+      margin-bottom: .22rem;
+    }
+
+    /* track name */
+    .track-pill-title {
+      font-family: 'Avenir Next', 'Avenir', sans-serif;
+      font-weight: 700;
+      font-size: .68rem;
+      letter-spacing: .01em;
+      line-height: 1;
+      color: var(--k);
+      display: block;
+      margin-bottom: .2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* genre */
+    .track-pill-meta {
+      font-family: 'DM Mono', 'Courier New', monospace;
+      font-size: .41rem;
+      letter-spacing: .11em;
+      color: var(--k3);
+      display: block;
+      white-space: nowrap;
     }
 
     /* Progress bar */
@@ -527,16 +614,30 @@
     }
 
     .event {
+      position: relative;
       padding: 1.4rem 0;
       border-top: 1px solid rgba(42,42,42,.1);
       display: grid;
       grid-template-columns: 3rem 1fr;
       gap: 1.4rem;
       align-items: start;
-      opacity: 1;
-      transform: translateY(0);
-      transition: opacity .6s ease, transform .6s ease, padding-left .25s;
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .7s ease, transform .85s cubic-bezier(.16,1,.3,1), padding-left .25s;
     }
+
+    .event::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0%;
+      height: 1px;
+      background: linear-gradient(90deg, var(--r), var(--y));
+      transition: width .45s cubic-bezier(.16,1,.3,1);
+      pointer-events: none;
+    }
+
+    .event:hover::after { width: 100%; }
 
     .event:hover { padding-left: .5rem; }
 
@@ -608,7 +709,7 @@
       margin: 2.5rem 0 3rem;
       align-items: flex-end;
     }
-    .countdown-unit { text-align: center; }
+    .countdown-unit { text-align: center; perspective: 300px; }
     .countdown-num {
       font-family: 'Avenir Next', 'Avenir', sans-serif;
       font-size: clamp(2rem, 6vw, 3.5rem);
@@ -975,6 +1076,238 @@
       to { opacity: 1; }
     }
 
+    /* ─── SCROLL PROGRESS BAR ─── */
+    #scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--y), var(--r));
+      z-index: 99999;
+      pointer-events: none;
+      transform-origin: left;
+    }
+
+    /* ─── COUNTDOWN DIGIT FLIP ─── */
+    .countdown-num { display: block; transform-origin: center; }
+    @keyframes digitFlip {
+      0%   { transform: rotateX(0deg); opacity: 1; }
+      40%  { transform: rotateX(-90deg); opacity: 0; }
+      60%  { transform: rotateX(90deg);  opacity: 0; }
+      100% { transform: rotateX(0deg); opacity: 1; }
+    }
+    .countdown-num.flip { animation: digitFlip .28s cubic-bezier(.4,0,.2,1) both; }
+
+    /* ─── GENRE TAG STAGGER ─── */
+    .hero-genres span {
+      opacity: 0;
+      transform: translateY(8px);
+      animation: genreIn .55s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    .hero-genres span:nth-child(1) { animation-delay: .5s; }
+    .hero-genres span:nth-child(2) { animation-delay: .67s; }
+    .hero-genres span:nth-child(3) { animation-delay: .84s; }
+    @keyframes genreIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── SECTION TAG REVEAL ─── */
+    .section-tag {
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: opacity .55s ease, transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    .section-tag.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ─── BOOKING INTRO WORD REVEAL ─── */
+    .wi-outer {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+    .wi-inner {
+      display: inline-block;
+      transform: translateY(110%);
+      opacity: 0;
+      transition: transform .8s cubic-bezier(.16,1,.3,1), opacity .5s ease;
+    }
+    .booking-intro.in-view .wi-inner {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── SCRAMBLE SPAN (hero title) ─── */
+    [data-scramble] { display: inline; }
+
+    /* ─── SPRING EASING ─── */
+    :root {
+      --spring: cubic-bezier(.16,1,.3,1);
+      --bounce: cubic-bezier(.34,1.56,.64,1);
+    }
+
+    /* ─── PROGRESS TRACK SHIMMER ─── */
+    @keyframes shimmer {
+      0%   { background-position: -300px center; }
+      100% { background-position:  300px center; }
+    }
+    .prog-track::before {
+      background: linear-gradient(90deg,
+        rgba(42,42,42,.06) 25%,
+        rgba(42,42,42,.18) 50%,
+        rgba(42,42,42,.06) 75%);
+      background-size: 300px 100%;
+      animation: shimmer 2.2s ease-in-out infinite;
+    }
+
+    /* ─── TICKER SPEED UP ON HOVER ─── */
+    .ticker-wrap { cursor: default; }
+    .ticker-track:hover { animation-duration: 9s; }
+
+    /* ─── HERO GENRE TAG HOVER GLOW ─── */
+    .hero-genres span {
+      transition: background .25s, border-color .25s, color .25s, box-shadow .25s;
+    }
+    .hero-genres span:hover {
+      background: rgba(255,255,255,.18);
+      border-color: rgba(255,255,255,.7);
+      box-shadow: 0 0 18px rgba(255,207,0,.35);
+    }
+
+    /* ─── CURSOR AMBIENT BLOB ─── */
+    #cursor-blob {
+      position: fixed;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,54,0,.048) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      transform: translate(-50%,-50%);
+    }
+
+    /* ─── EVENT DATE HOVER SCALE ─── */
+    .event.upcoming .ev-day {
+      display: inline-block;
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+    }
+    .event.upcoming:hover .ev-day {
+      transform: scale(1.13) translateX(3px);
+    }
+
+    /* ─── EVENT BADGE PULSE ─── */
+    @keyframes badgePulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(204,61,0,.35); }
+      60%       { opacity: .7; box-shadow: 0 0 0 6px rgba(204,61,0,0); }
+    }
+    .ev-badge { animation: badgePulse 3s ease-in-out infinite; }
+
+    /* ─── TRACK LABEL HOVER ─── */
+    .track-name { transition: letter-spacing .45s ease; }
+    .track-label:hover .track-name { letter-spacing: .3em; }
+
+    /* ─── FOOTER SOCIAL LIFT ─── */
+    .footer-social a {
+      transition: opacity .2s, border-color .2s, color .2s,
+                  transform .35s cubic-bezier(.16,1,.3,1), box-shadow .3s;
+    }
+    .footer-social a:hover {
+      transform: translateY(-4px) scale(1.15);
+      box-shadow: 0 8px 20px rgba(204,61,0,.18);
+    }
+
+    /* ─── EVENTS COL LABEL REVEAL ─── */
+    .events-col-label {
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: opacity .55s ease, transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    .events-col-label.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ─── COUNTDOWN HOVER TINT ─── */
+    .countdown-unit { transition: transform .3s cubic-bezier(.16,1,.3,1); }
+    .countdown-unit:hover { transform: translateY(-3px); }
+    .countdown-unit:hover .countdown-num { color: var(--o); }
+
+    /* ─── PLAY BTN IDLE RING ─── */
+    @keyframes playRing {
+      0%   { box-shadow: 0 0 0 0 rgba(255,255,255,.28); }
+      70%  { box-shadow: 0 0 0 16px rgba(255,255,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    }
+    .play-btn:not(.playing) { animation: playRing 2.2s ease-out infinite; }
+
+    /* ─── CAL BTN HOVER SLIDE ─── */
+    .cal-btn { overflow: hidden; position: relative; }
+    .cal-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--o);
+      transform: translateX(-101%);
+      transition: transform .35s cubic-bezier(.16,1,.3,1);
+      z-index: -1;
+      border-radius: inherit;
+    }
+    .cal-btn:hover { color: var(--w); border-color: var(--o); }
+    .cal-btn:hover::after { transform: translateX(0); }
+
+    /* ─── SOCIAL BTN ICON SPIN ─── */
+    .social-btn svg { transition: transform .4s cubic-bezier(.16,1,.3,1); }
+    .social-btn:hover svg { transform: rotate(12deg) scale(1.15); }
+
+    /* ─── BOOKING SECTION DIVIDER LINE ─── */
+    .booking-section {
+      position: relative;
+    }
+    .booking-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(42,42,42,.1), transparent);
+      transform: scaleX(0);
+      transition: transform 1.2s cubic-bezier(.16,1,.3,1);
+    }
+    .booking-section.in-view::before {
+      transform: scaleX(1);
+    }
+
+    /* ─── HERO FLOAT (subtle idle) ─── */
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    /* ─── BEAT TINT — warm flash on beat ─── */
+    #beat-tint {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9799;
+      opacity: 0;
+      background: radial-gradient(ellipse 65% 50% at 50% 38%, rgba(255,90,0,.14) 0%, transparent 72%);
+      transition: opacity .06s ease-out;
+    }
+
+    /* ─── BEAT RIPPLE ─── */
+    .beat-ripple {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9996;
+      transform: translate(-50%,-50%) scale(0.05);
+      animation: beatRippleOut .75s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    @keyframes beatRippleOut {
+      0%   { transform: translate(-50%,-50%) scale(0.05); opacity: .9; }
+      100% { transform: translate(-50%,-50%) scale(1);    opacity: 0; }
+    }
+
 
   </style>
 </head>
@@ -982,6 +1315,8 @@
 
 
 
+  <div id="scroll-progress"></div>
+  <div id="beat-tint"></div>
   <div id="cur"></div>
   <div id="ring"></div>
 
@@ -1002,11 +1337,11 @@
     </div>
 
     <h1 class="hero-title fade-in d1">
-      MAISON<br>
-      82
-      <span class="line2">COLLECTIVE</span>
+      <span data-scramble="MAISON">MAISON</span><br>
+      <span data-scramble="82">82</span>
+      <span class="line2" data-scramble="COLLECTIVE">COLLECTIVE</span>
     </h1>
-    <div class="hero-genres fade-in d2">
+    <div class="hero-genres">
       <span>House</span>
       <span>Afro House</span>
       <span>Tech House</span>
@@ -1041,8 +1376,23 @@
     </div>
 
     <div class="track-label">
-      <div class="track-name">Eau salée House Mix</div>
+      <div class="track-name" id="trackName">Eau salée House Mix</div>
       <div class="track-sub">Maison82collective</div>
+    </div>
+
+    <div class="track-switcher">
+      <button class="track-pill active" data-src="mix.m4a" data-title="Eau salée House Mix">
+        <span class="track-pill-dot"></span>
+        <span class="track-pill-num">01</span>
+        <span class="track-pill-title">Eau salée House Mix</span>
+        <span class="track-pill-meta">Afro House · Deep &amp; Warm</span>
+      </button>
+      <button class="track-pill" data-src="caverne.m4a" data-title="Caverne House Mix">
+        <span class="track-pill-dot"></span>
+        <span class="track-pill-num">02</span>
+        <span class="track-pill-title">Caverne House Mix</span>
+        <span class="track-pill-meta">Tech House · Dark &amp; Raw</span>
+      </button>
     </div>
 
     <div class="progress-area">
@@ -1283,13 +1633,17 @@
       requestAnimationFrame(tickRing);
     })();
 
-    /* ── HERO ORB PARALLAX ── */
+    /* ── HERO ORB PARALLAX + VELOCITY DISTORTION ── */
     const heroOrb = document.getElementById('heroOrb');
     let orbTx = 0, orbTy = 0, orbTxT = 0, orbTyT = 0;
+    let orbVx = 0, orbVy = 0;
+    let beatScale = 1; // declared early — used in tickOrb RAF
 
     document.addEventListener('mousemove', e => {
       orbTxT = (e.clientX / window.innerWidth  - .5) * 28;
       orbTyT = (e.clientY / window.innerHeight - .5) * 28;
+      orbVx = orbVx * 0.72 + (e.movementX || 0) * 0.28;
+      orbVy = orbVy * 0.72 + (e.movementY || 0) * 0.28;
     });
 
     let orbScrollY = 0;
@@ -1298,7 +1652,11 @@
     (function tickOrb() {
       orbTx += (orbTxT - orbTx) * .05;
       orbTy += (orbTyT - orbTy) * .05;
-      heroOrb.style.transform = `translate(${orbTx}px, ${orbTy + orbScrollY * 0.22}px)`;
+      orbVx *= 0.88; orbVy *= 0.88;
+      heroOrb.style.transform =
+        `translate(${orbTx}px, ${orbTy + orbScrollY * 0.22}px)` +
+        ` scale(${beatScale})` +
+        ` skewX(${orbVx * 0.055}deg) skewY(${orbVy * 0.055}deg)`;
       requestAnimationFrame(tickOrb);
     })();
 
@@ -1596,53 +1954,117 @@
     /* ── COUNTDOWN ── */
     (function tickCountdown() {
       const target = new Date('2026-05-13T20:00:00+02:00');
+      function setVal(id, val) {
+        const el = document.getElementById(id);
+        if (el.textContent !== val) {
+          el.classList.remove('flip');
+          void el.offsetWidth; // force reflow so animation restarts
+          el.classList.add('flip');
+          el.textContent = val;
+        }
+      }
       function update() {
         const diff = target - Date.now();
         if (diff <= 0) {
-          ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => document.getElementById(id).textContent = '00');
+          ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(id => setVal(id, '00'));
           return;
         }
         const d = Math.floor(diff / 86400000);
         const h = Math.floor((diff % 86400000) / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
         const s = Math.floor((diff % 60000) / 1000);
-        document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
-        document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
-        document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
-        document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+        setVal('cd-days',  String(d).padStart(2,'0'));
+        setVal('cd-hours', String(h).padStart(2,'0'));
+        setVal('cd-mins',  String(m).padStart(2,'0'));
+        setVal('cd-secs',  String(s).padStart(2,'0'));
       }
       update();
       setInterval(update, 1000);
     })();
 
 
-    /* ── BEAT-REACTIVE HERO ORB ── */
-    let beatScale = 1;
+    /* ── BEAT SYNC EFFECTS ── */
+    const beatTintEl = document.getElementById('beat-tint');
+    let beatAvg = 0;
+    let beatCooldown = false;
+    let particleBurst     = null; // set by particle IIFE below
+    let particleDropBurst = null; // screen-wide scatter on drops
+
+    function spawnBeatRipple(intensity) {
+      const wrap = document.getElementById('playerWrap');
+      if (!wrap) return;
+      const rc = wrap.getBoundingClientRect();
+      const cx = rc.left + rc.width  / 2;
+      const cy = rc.top  + rc.height / 2;
+      const passes = intensity > 0.55 ? 2 : 1;
+      for (let p = 0; p < passes; p++) {
+        const size = 90 + intensity * 340;
+        const el = document.createElement('div');
+        el.className = 'beat-ripple';
+        el.style.width  = size + 'px';
+        el.style.height = size + 'px';
+        el.style.left   = cx + 'px';
+        el.style.top    = cy + 'px';
+        if (p === 0) {
+          el.style.border = `1.5px solid rgba(255,54,0,${0.55 + intensity * 0.35})`;
+        } else {
+          el.style.border = `1px solid rgba(255,207,0,${0.35 + intensity * 0.25})`;
+          el.style.animationDelay = '0.1s';
+          el.style.animationDuration = '0.9s';
+        }
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 950);
+      }
+    }
+
+    function triggerBeat(intensity) {
+      /* warm tint flash */
+      if (beatTintEl) {
+        beatTintEl.style.opacity = Math.min(intensity * 0.85, 0.55).toFixed(3);
+        setTimeout(() => { if (beatTintEl) beatTintEl.style.opacity = '0'; }, 130);
+      }
+      /* ripple waves */
+      spawnBeatRipple(intensity);
+      /* particle burst from orb */
+      if (particleBurst) {
+        const pw = document.getElementById('playerWrap');
+        if (pw) {
+          const rp = pw.getBoundingClientRect();
+          particleBurst(rp.left + rp.width / 2, rp.top + rp.height / 2, intensity);
+        }
+      }
+      /* drop: scatter particles across the entire screen */
+      if (intensity > 0.55 && particleDropBurst) {
+        particleDropBurst(Math.round(30 + intensity * 70));
+      }
+    }
+
+    /* ── BEAT-REACTIVE HERO ORB (beatScale declared above, used in tickOrb) ── */
     (function beatLoop() {
       if (analyser && isPlaying) {
         const bass = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(bass);
         const avg = (bass[1] + bass[2] + bass[3] + bass[4] + bass[5]) / 5 / 255;
-        const target = 1 + avg * 0.08;
-        beatScale += (target - beatScale) * 0.15;
+        const tgt = 1 + avg * 0.08;
+        beatScale += (tgt - beatScale) * 0.15;
+
+        /* running average for beat detection */
+        beatAvg = beatAvg * 0.93 + avg * 0.07;
+
+        /* beat fired when energy is well above the running average */
+        if (!beatCooldown && avg > beatAvg * 1.38 && avg > 0.17) {
+          const intensity = Math.min((avg - beatAvg * 1.38) / 0.28, 1);
+          triggerBeat(intensity);
+          beatCooldown = true;
+          setTimeout(() => { beatCooldown = false; }, 195);
+        }
       } else {
         beatScale += (1 - beatScale) * 0.05;
+        beatAvg   *= 0.985; /* slowly decay average when paused */
       }
-      heroOrb.style.transform = `scale(${beatScale})`;
       requestAnimationFrame(beatLoop);
     })();
 
-    /* ── STAGGERED SCROLL PARALLAX on event items ── */
-    const evItems = document.querySelectorAll('.event');
-    window.addEventListener('scroll', () => {
-      evItems.forEach((el, i) => {
-        const r = el.getBoundingClientRect();
-        const mid = r.top + r.height / 2 - window.innerHeight / 2;
-        const shift = mid * (i % 2 === 0 ? 0.03 : -0.03);
-        if (el.matches(':hover')) return;
-        el.style.transform = `translateY(${shift}px)`;
-      });
-    }, { passive: true });
 
     /* ── PLAYER ORB PULSE WHEN PLAYING ── */
     const playerWrap = document.getElementById('playerWrap');
@@ -1713,12 +2135,417 @@
       }
     });
 
+    /* ── TRACK SWITCHER ── */
+    (function() {
+      const pills     = document.querySelectorAll('.track-pill');
+      const trackName = document.getElementById('trackName');
+
+      function syncDot() {
+        pills.forEach(p => p.classList.remove('now-playing'));
+        const active = document.querySelector('.track-pill.active');
+        if (active && isPlaying) active.classList.add('now-playing');
+      }
+
+      // keep dot in sync with play/pause state
+      playBtn.addEventListener('click', () => setTimeout(syncDot, 50));
+
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          if (pill.classList.contains('active')) return;
+
+          // remember position & play state before switching
+          const wasPlaying = isPlaying;
+          const pct = (audio.duration && !isNaN(audio.duration))
+            ? audio.currentTime / audio.duration : 0;
+
+          // stop current playback
+          audio.pause();
+          isPlaying = false;
+          playBtn.classList.remove('playing');
+          playerWrap.classList.remove('playing');
+
+          // swap source
+          const src   = pill.dataset.src;
+          const title = pill.dataset.title;
+          audio.src = src;
+          audio.load();
+
+          // reset AudioContext so analyser stays connected on next play
+          if (audioCtx) {
+            audioCtx.close();
+            audioCtx = null;
+            analyser = null;
+          }
+
+          // once metadata is ready, seek to same relative position
+          audio.addEventListener('loadedmetadata', function onMeta() {
+            audio.removeEventListener('loadedmetadata', onMeta);
+            if (pct > 0) audio.currentTime = pct * audio.duration;
+
+            if (wasPlaying) {
+              initAudio();
+              audioCtx.resume().then(() => {
+                audio.play().then(() => {
+                  isPlaying = true;
+                  playBtn.classList.add('playing');
+                  playerWrap.classList.add('playing');
+                  syncDot();
+                }).catch(() => {});
+              });
+            }
+          }, { once: true });
+
+          // update UI
+          trackName.style.opacity = '0';
+          setTimeout(() => {
+            trackName.textContent   = title;
+            trackName.style.opacity = '1';
+          }, 180);
+
+          pills.forEach(p => { p.classList.remove('active'); p.classList.remove('now-playing'); });
+          pill.classList.add('active');
+        });
+      });
+    })();
+
     // Reset red borders on input
     ['f-name','f-email'].forEach(id => {
       document.getElementById(id).addEventListener('input', function() {
         this.style.borderBottomColor = '';
       });
     });
+
+    /* ── SCROLL PROGRESS BAR ── */
+    (function() {
+      const bar = document.getElementById('scroll-progress');
+      window.addEventListener('scroll', () => {
+        const scrolled = document.documentElement.scrollTop;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (max > 0 ? (scrolled / max * 100) : 0) + '%';
+      }, { passive: true });
+    })();
+
+    /* ── HERO TITLE SCRAMBLE ── */
+    (function() {
+      const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      function scramble(el, delay) {
+        const target = el.dataset.scramble;
+        if (!target) return;
+        let frame = 0;
+        const totalFrames = target.length * 5 + 10;
+        setTimeout(() => {
+          const tick = () => {
+            const revealed = Math.floor(frame / 5);
+            let result = '';
+            for (let i = 0; i < target.length; i++) {
+              if (i < revealed) result += target[i];
+              else result += CHARS[Math.floor(Math.random() * CHARS.length)];
+            }
+            el.textContent = result;
+            frame++;
+            if (frame <= totalFrames) requestAnimationFrame(tick);
+            else el.textContent = target;
+          };
+          tick();
+        }, delay);
+      }
+      document.querySelectorAll('[data-scramble]').forEach((el, i) => scramble(el, 80 + i * 140));
+    })();
+
+    /* ── SECTION + BOOKING INTRO REVEAL ── */
+    (function() {
+      const revObs = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            en.target.classList.add('in-view');
+            revObs.unobserve(en.target);
+          }
+        });
+      }, { threshold: .18 });
+      document.querySelectorAll('.section-tag, .booking-intro, .events-col-label, .booking-section').forEach(el => revObs.observe(el));
+    })();
+
+    /* ── CURSOR WHITE ON HERO ── */
+    (function() {
+      const heroSec = document.querySelector('.hero');
+      function checkHero() {
+        if (!heroSec) return;
+        const bottom = heroSec.getBoundingClientRect().bottom;
+        cur.style.background = bottom > 80 ? '#ffffff' : 'var(--k)';
+      }
+      checkHero();
+      window.addEventListener('scroll', checkHero, { passive: true });
+    })();
+
+
+    /* ── CURSOR AMBIENT BLOB ── */
+    if (!isTouchDevice) {
+      const blob = document.getElementById('cursor-blob') || (() => {
+        const b = document.createElement('div');
+        b.id = 'cursor-blob';
+        document.body.appendChild(b);
+        return b;
+      })();
+      let bx = window.innerWidth / 2, by = window.innerHeight / 2;
+      (function blobLoop() {
+        bx += (mx - bx) * 0.032;
+        by += (my - by) * 0.032;
+        blob.style.left = bx + 'px';
+        blob.style.top  = by + 'px';
+        requestAnimationFrame(blobLoop);
+      })();
+    }
+
+    /* ── PLAY BUTTON PARTICLE BURST ── */
+    function burstParticles(cx, cy) {
+      const colors = ['#ffcf00','#ff3600','#ff3600','#ffffff'];
+      for (let i = 0; i < 20; i++) {
+        const p    = document.createElement('div');
+        const ang  = (i / 20) * Math.PI * 2 + Math.random() * 0.5;
+        const spd  = 50 + Math.random() * 90;
+        const sz   = 2.5 + Math.random() * 4;
+        const col  = colors[Math.floor(Math.random() * colors.length)];
+        p.style.cssText =
+          `position:fixed;width:${sz}px;height:${sz}px;border-radius:50%;` +
+          `background:${col};pointer-events:none;z-index:9997;` +
+          `transform:translate(-50%,-50%);mix-blend-mode:multiply;`;
+        p.style.left = cx + 'px';
+        p.style.top  = cy + 'px';
+        document.body.appendChild(p);
+        let px = cx, py = cy;
+        let vx = Math.cos(ang) * spd * 0.016;
+        let vy = Math.sin(ang) * spd * 0.016 - 1;
+        let life = 1;
+        (function tick() {
+          life -= 0.036;
+          vx *= 0.93; vy *= 0.93; vy += 0.22;
+          px += vx; py += vy;
+          p.style.left    = px + 'px';
+          p.style.top     = py + 'px';
+          p.style.opacity = Math.max(0, life).toFixed(3);
+          p.style.transform = `translate(-50%,-50%) scale(${Math.max(0, life).toFixed(3)})`;
+          if (life > 0) requestAnimationFrame(tick);
+          else p.remove();
+        })();
+      }
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (!isPlaying) {
+        const r = playBtn.getBoundingClientRect();
+        burstParticles(r.left + r.width / 2, r.top + r.height / 2);
+      }
+    });
+
+    /* ── BOOKING INTRO WORD-BY-WORD REVEAL ── */
+    (function() {
+      const intro = document.querySelector('.booking-intro');
+      if (!intro) return;
+      intro.innerHTML = intro.innerHTML
+        .replace(/<br\s*\/?>/gi, ' ⏎ ')
+        .trim()
+        .split(/\s+/)
+        .map(w => {
+          if (w === '⏎') return '<br>';
+          return `<span class="wi-outer"><span class="wi-inner">${w}</span></span>`;
+        })
+        .join(' ');
+      intro.querySelectorAll('.wi-inner').forEach((w, i) => {
+        w.style.transitionDelay = (i * 0.07) + 's';
+      });
+    })();
+
+    /* ── TICKER PAUSE / SPEED ── */
+    const tickerTrack = document.querySelector('.ticker-track');
+    if (tickerTrack && !isTouchDevice) {
+      tickerTrack.addEventListener('mouseenter', () => {
+        tickerTrack.style.animationPlayState = 'paused';
+      });
+      tickerTrack.addEventListener('mouseleave', () => {
+        tickerTrack.style.animationPlayState = '';
+      });
+    }
+
+    /* ── MULTI-LAYER PARALLAX ── */
+    (function() {
+      const hTitle    = document.querySelector('.hero-title');
+      const hGenres   = document.querySelector('.hero-genres');
+      const hScroll   = document.querySelector('.scroll-indicator');
+      const pWrap     = document.getElementById('playerWrap');
+      const pSection  = document.querySelector('.player-section');
+      const colLabels = document.querySelectorAll('.events-col-label');
+      const bookForm  = document.getElementById('bookingForm');
+      const bIntro    = document.querySelector('.booking-intro');
+      const footerEl  = document.querySelector('footer');
+
+      let lastSY = -1;
+
+      (function plxLoop() {
+        const sy = window.scrollY;
+        if (sy === lastSY) { requestAnimationFrame(plxLoop); return; }
+        lastSY = sy;
+        const vh = window.innerHeight;
+
+        /* Hero layers — title moves slower, genres a bit faster, indicator falls away */
+        if (hTitle)   hTitle.style.transform  = `translateY(${sy * 0.18}px)`;
+        if (hGenres)  hGenres.style.transform = `translateY(${sy * 0.11}px)`;
+        if (hScroll)  hScroll.style.transform = `translateX(-50%) translateY(${sy * 0.38}px) scale(${Math.max(0, 1 - sy * 0.004)})`;
+
+        /* Player section — orb container drifts slightly on scroll */
+        if (pWrap) {
+          const pt = pWrap.getBoundingClientRect().top;
+          const pd = (pt + pWrap.offsetHeight / 2 - vh / 2) * 0.055;
+          pWrap.style.transform = `translateY(${pd}px)`;
+        }
+
+        /* Player section heading (section-tag inside player doesn't exist,
+           but the section itself gets a subtle bg-layer feel via translateY) */
+        if (pSection) {
+          const pt = pSection.getBoundingClientRect().top;
+          const pd = (pt - vh / 2) * 0.03;
+          pSection.style.backgroundPositionY = `calc(50% + ${pd}px)`;
+        }
+
+        /* Event column labels — opposite horizontal drift */
+        colLabels.forEach((el, i) => {
+          const rt = el.getBoundingClientRect().top;
+          const d  = (rt - vh / 2) * (i === 0 ? -0.035 : 0.035);
+          if (el.classList.contains('in-view')) {
+            el.style.transform = `translateX(${d}px)`;
+          }
+        });
+
+        /* Booking intro — floats up slightly faster */
+        if (bIntro && bIntro.classList.contains('in-view')) {
+          const bt = bIntro.getBoundingClientRect().top;
+          const bd = (bt - vh / 2) * 0.04;
+          bIntro.style.transform = `translateY(${bd}px)`;
+        }
+
+        /* Footer — gentle upward drift as it comes into view */
+        if (footerEl) {
+          const ft = footerEl.getBoundingClientRect().top;
+          const fd = Math.max(0, ft - vh) * 0.05;
+          footerEl.style.transform = `translateY(${fd}px)`;
+        }
+
+        requestAnimationFrame(plxLoop);
+      })();
+    })();
+
+    /* ── SCROLL VELOCITY → CURSOR SIZE ── */
+    (function() {
+      let lastY = window.scrollY, scrollV = 0;
+      window.addEventListener('scroll', () => {
+        scrollV = Math.abs(window.scrollY - lastY);
+        lastY = window.scrollY;
+        const s = 1 + Math.min(scrollV * 0.08, 1.2);
+        cur.style.transform = `translate(-50%,-50%) scale(${s})`;
+      }, { passive: true });
+      // Decay back to normal
+      (function decay() {
+        scrollV *= 0.8;
+        const s = 1 + Math.min(scrollV * 0.08, 1.2);
+        cur.style.transform = `translate(-50%,-50%) scale(${s})`;
+        requestAnimationFrame(decay);
+      })();
+    })();
+
+    /* ── AMBIENT PARTICLES (active while playing) ── */
+    (function() {
+      const pc = document.createElement('canvas');
+      pc.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9700;';
+      document.body.appendChild(pc);
+
+      function resize() {
+        pc.width  = window.innerWidth;
+        pc.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize, { passive: true });
+
+      const pctx = pc.getContext('2d');
+      const COLS = ['#ffcf00','#ff3600','#ff3600','#ff5500','#ffaa00'];
+      const pts  = [];
+      const MAX  = 320;
+
+      function spawnPts(cx, cy, n, spd) {
+        for (let i = 0; i < n; i++) {
+          if (pts.length >= MAX) break;
+          const ang = Math.random() * Math.PI * 2;
+          const s   = (0.4 + Math.random() * 1.6) * (spd || 1);
+          pts.push({
+            x:  cx + (Math.random() - .5) * 36,
+            y:  cy + (Math.random() - .5) * 36,
+            vx: Math.cos(ang) * s,
+            vy: Math.sin(ang) * s - .3,
+            r:  .7 + Math.random() * 2.4,
+            col: COLS[Math.floor(Math.random() * COLS.length)],
+            life:  1,
+            decay: .003 + Math.random() * .008,
+          });
+        }
+      }
+
+      /* expose for beat burst (from orb) */
+      particleBurst = function(cx, cy, intensity) {
+        spawnPts(cx, cy, Math.round(10 + (intensity || .5) * 22), 1.8 + (intensity || .5) * 2.2);
+      };
+
+      /* expose for drop burst (random screen positions) */
+      particleDropBurst = function(n) {
+        for (let i = 0; i < n; i++) {
+          if (pts.length >= MAX) break;
+          const ang = Math.random() * Math.PI * 2;
+          const s   = 0.12 + Math.random() * 0.65;
+          pts.push({
+            x:    Math.random() * pc.width,
+            y:    Math.random() * pc.height,
+            vx:   Math.cos(ang) * s,
+            vy:   Math.sin(ang) * s - 0.14,
+            r:    1 + Math.random() * 3,
+            col:  COLS[Math.floor(Math.random() * COLS.length)],
+            life:  1,
+            decay: 0.003 + Math.random() * 0.005,
+          });
+        }
+      };
+
+      function getCenter() {
+        const w = document.getElementById('playerWrap');
+        if (!w) return { x: innerWidth / 2, y: innerHeight / 2 };
+        const r = w.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }
+
+      let frame = 0;
+      (function loop() {
+        requestAnimationFrame(loop);
+        pctx.clearRect(0, 0, pc.width, pc.height);
+
+        /* steady trickle while playing */
+        if (isPlaying && ++frame % 4 === 0 && pts.length < MAX) {
+          const c = getCenter();
+          spawnPts(c.x, c.y, 2, .75);
+        }
+
+        for (let i = pts.length - 1; i >= 0; i--) {
+          const p = pts[i];
+          p.x   += p.vx;
+          p.y   += p.vy;
+          p.vx  += (Math.random() - .5) * .04;
+          p.vy  -= .007;          /* gentle upward drift */
+          p.life -= p.decay;
+          if (p.life <= 0) { pts.splice(i, 1); continue; }
+          pctx.globalAlpha = p.life * .7;
+          pctx.fillStyle   = p.col;
+          pctx.beginPath();
+          pctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          pctx.fill();
+        }
+        pctx.globalAlpha = 1;
+      })();
+    })();
 
   </script>
 </body>
