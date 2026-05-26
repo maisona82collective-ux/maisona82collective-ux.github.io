@@ -171,7 +171,7 @@
       "name": "Daydance — Maison82collective",
       "startDate": "2026-05-23T14:00:00+02:00",
       "endDate": "2026-05-23T22:00:00+02:00",
-      "eventStatus": "https://schema.org/EventScheduled",
+      "eventStatus": "https://schema.org/EventCompleted",
       "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
       "location": {
         "@type": "Place",
@@ -1721,8 +1721,8 @@
 
     <!-- Countdown -->
     <div>
-      <div class="countdown-event-name" data-reveal="up">Next Event — Daydance · Seeburg Luzern</div>
-      <div class="countdown-wrap" data-reveal="up" data-delay="0.1">
+      <div class="countdown-event-name" data-reveal="up" style="display:none;">Next Event — Daydance · Seeburg Luzern</div>
+      <div class="countdown-wrap" data-reveal="up" data-delay="0.1" style="display:none;">
         <div class="countdown-unit"><div class="countdown-num" id="cd-days">--</div><div class="countdown-label">Days</div></div>
         <div class="countdown-sep">·</div>
         <div class="countdown-unit"><div class="countdown-num" id="cd-hours">--</div><div class="countdown-label">Hours</div></div>
@@ -1737,8 +1737,17 @@
       <!-- Upcoming -->
       <div>
         <div class="events-col-label">Upcoming</div>
+        <div class="event" style="opacity:.45;">
+          <div><div class="ev-day">—</div></div>
+          <div><div class="ev-name" style="font-size:.6rem;letter-spacing:.2em;">MORE DATES SOON</div></div>
+        </div>
+      </div>
 
-        <div class="event upcoming">
+      <!-- Past -->
+      <div>
+        <div class="events-col-label">Past</div>
+
+        <div class="event past">
           <div>
             <div class="ev-day">23</div>
             <div class="ev-mon">May 26</div>
@@ -1746,15 +1755,8 @@
           <div>
             <div class="ev-name">DAYDANCE</div>
             <div class="ev-venue">Seeburg &amp; Sunset Bar<br>by Timeless Tunes</div>
-            <span class="ev-badge">Upcoming</span>
-            <br><a class="cal-btn" href="data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART;VALUE=DATE:20260523%0ADTEND;VALUE=DATE:20260524%0ASUMMARY:Daydance — Maison82collective%0ALOCATION:Seeburg %26 Sunset Bar%2C Luzern%0AEND:VEVENT%0AEND:VCALENDAR" download="daydance.ics"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H5V8h14v13z"/></svg>Add to calendar</a>
           </div>
         </div>
-      </div>
-
-      <!-- Past -->
-      <div>
-        <div class="events-col-label">Past</div>
 
         <div class="event past">
           <div>
